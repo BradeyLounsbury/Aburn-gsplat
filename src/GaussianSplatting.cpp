@@ -115,6 +115,8 @@ void GaussianSplattingRenderer::Load(const char* file) {
 	geomBufferFunc = resizeFunctional(&geomPtr, allocdGeom);
 	binningBufferFunc = resizeFunctional(&binningPtr, allocdBinning);
 	imgBufferFunc = resizeFunctional(&imgPtr, allocdImg);
+
+	std::cout << "Finished Loading Gaussian ply file\n";
 }
 
 void GaussianSplattingRenderer::Render(float* image_cuda, Aftr::Mat4 view_mat, Aftr::Mat4 proj_mat, Aftr::Vector position, float fovy, int width, int height) {

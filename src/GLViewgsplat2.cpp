@@ -38,6 +38,12 @@
 #include "gaussiansplatting.h"
 
 using namespace Aftr;
+GaussianSplattingRenderer R;
+bool do_render = false;
+float boxmin[3];
+float boxmax[3];
+float scenemin[3];
+float scenemax[3];
 
 GLViewgsplat2* GLViewgsplat2::New( const std::vector< std::string >& args )
 {
@@ -94,6 +100,10 @@ void GLViewgsplat2::updateWorld()
    GLView::updateWorld(); //Just call the parent's update world first.
                           //If you want to add additional functionality, do it after
                           //this call.
+
+   if (do_render) {
+       //R.Render()
+   }
 }
 
 
@@ -129,7 +139,19 @@ void GLViewgsplat2::onKeyDown( const SDL_KeyboardEvent& key )
 
    if( key.keysym.sym == SDLK_1 )
    {
-       //test();
+       std::string bonsai(ManagerEnvironmentConfiguration::getLMM() + "models/bonsai/input.ply");
+       boxmin[0] = 0; boxmin[1] = 0; boxmin[2] = 0;
+       boxmax[0] = 1; boxmax[1] = 1; boxmax[2] = 1;
+       scenemin[0] = 0; scenemin[1] = 0; scenemin[2] = 0;
+       scenemax[0] = 1; scenemax[1] = 1; scenemax[2] = 1;
+       R.SetCrop(boxmin, boxmax);
+       R.GetSceneSize(scenemin, scenemax);
+       R.Load(bonsai.c_str());
+   }
+
+   if (key.keysym.sym == SDLK_2) {
+       do_render = true;
+       std::cout << "Starting Rendering\n";
    }
 }
 
@@ -142,13 +164,6 @@ void GLViewgsplat2::onKeyUp( const SDL_KeyboardEvent& key )
 
 void Aftr::GLViewgsplat2::loadMap()
 {
-   GaussianSplattingRenderer R;
-   std::string bonsai(ManagerEnvironmentConfiguration::getLMM() + "bonsai/input.ply");
-   float boxmin[3]{ 0,0,0 }; float boxmax[3]{ 1,1,1 }; float scenemin[3]{ 0,0,0 }; float scenemax[3]{ 1,1,1 };
-   R.SetCrop(boxmin, boxmax);
-   R.GetSceneSize(scenemin, scenemax);
-   R.Load(bonsai.c_str());
-
    this->worldLst = new WorldList(); //WorldList is a 'smart' vector that is used to store WO*'s
    this->actorLst = new WorldList();
    this->netLst = new WorldList();
@@ -156,7 +171,7 @@ void Aftr::GLViewgsplat2::loadMap()
    ManagerOpenGLState::GL_CLIPPING_PLANE = 1000.0;
    ManagerOpenGLState::GL_NEAR_PLANE = 0.1f;
    ManagerOpenGLState::enableFrustumCulling = false;
-   Axes::isVisible = true;
+   Axes::isVisible = false;
    this->glRenderer->isUsingShadowMapping( false ); //set to TRUE to enable shadow mapping, must be using GL 3.2+
 
    this->cam->setPosition( 15,15,10 );
@@ -233,7 +248,7 @@ void Aftr::GLViewgsplat2::loadMap()
             grassSkin.setSpecularCoefficient( 10 ); // How "sharp" are the specular highlights (bigger is sharper, 1000 is very sharp, 10 is very dull)
          } );
       wo->setLabel( "Grass" );
-      worldLst->push_back( wo );
+      //worldLst->push_back( wo );
    }
 
    //{
